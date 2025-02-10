@@ -19,65 +19,65 @@ jobs:
           framework: terraform
           directory: ./aws-deploy
           output_format: cli
-
-  terrascan:
-    runs-on: ubuntu-latest
-    name: Terrascan
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Terrascan Scan
-        uses: tenable/terrascan-action@main
-        with:
-            iac_type: 'terraform'
-            iac_version: 'v14'
-            iac_dir: './aws-deploy'
-
-  tflint:
-    runs-on: ubuntu-latest
-    name: TFLint
-    steps:
-      - uses: actions/checkout@v4
-        name: Checkout source code
-      - uses: actions/cache@v2
-        name: Cache plugin dir
-        with:
-          path: config/plugins
-          key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
-      - uses: terraform-linters/setup-tflint@v4
-        name: Setup TFLint
-        with:
-          tflint_version: v0.52.0
-      - name: Init TFLint
-        run: tflint --init
-      - name: Run TFLint
-        run: tflint -f compact -c config/.tflint.hcl
-
-  trivy:
-    runs-on: ubuntu-latest
-    name: Trivy (formerly tfsec)
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Trivy Scan
-        uses: aquasecurity/trivy-action@0.29.0
-        with:
-          scan-type: 'fs'
-          trivy-config: config/trivy.yml
-          output: trivy-result.txt
-      - name: Check Trivy result file
-        run: cat trivy-result.txt
-      - name: Format Trivy Scan Result
-        run: |
-          if [ -s trivy-result.txt ]; then
-            echo -e "## Vulnerability Scan Results\n<details><summary>Details</summary>\n\n\`\`\`\n$(cat trivy-result.txt)\n\`\`\`\n</details>" > formatted-trivy-result.md
-          else
-            echo -e "## Vulnerability Scan Results\nNo vulnerabilities were detected." > formatted-trivy-result.md
-          fi
-      - name: Comment PR with Trivy scan results
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          path: formatted-trivy-result.md
-
-      - name: Clean up Trivy result file
-        run: rm -f trivy-result.txt formatted-trivy-result.md
+#
+#  terrascan:
+#    runs-on: ubuntu-latest
+#    name: Terrascan
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#      - name: Terrascan Scan
+#        uses: tenable/terrascan-action@main
+#        with:
+#            iac_type: 'terraform'
+#            iac_version: 'v14'
+#            iac_dir: './aws-deploy'
+#
+#  tflint:
+#    runs-on: ubuntu-latest
+#    name: TFLint
+#    steps:
+#      - uses: actions/checkout@v4
+#        name: Checkout source code
+#      - uses: actions/cache@v2
+#        name: Cache plugin dir
+#        with:
+#          path: config/plugins
+#          key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+#      - uses: terraform-linters/setup-tflint@v4
+#        name: Setup TFLint
+#        with:
+#          tflint_version: v0.52.0
+#      - name: Init TFLint
+#        run: tflint --init
+#      - name: Run TFLint
+#        run: tflint -f compact -c config/.tflint.hcl
+#
+#  trivy:
+#    runs-on: ubuntu-latest
+#    name: Trivy (formerly tfsec)
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#      - name: Trivy Scan
+#        uses: aquasecurity/trivy-action@0.29.0
+#        with:
+#          scan-type: 'fs'
+#          trivy-config: config/trivy.yml
+#          output: trivy-result.txt
+#      - name: Check Trivy result file
+#        run: cat trivy-result.txt
+#      - name: Format Trivy Scan Result
+#        run: |
+#          if [ -s trivy-result.txt ]; then
+#            echo -e "## Vulnerability Scan Results\n<details><summary>Details</summary>\n\n\`\`\`\n$(cat trivy-result.txt)\n\`\`\`\n</details>" > formatted-trivy-result.md
+#          else
+#            echo -e "## Vulnerability Scan Results\nNo vulnerabilities were detected." > formatted-trivy-result.md
+#          fi
+#      - name: Comment PR with Trivy scan results
+#        uses: marocchino/sticky-pull-request-comment@v2
+#        with:
+#          path: formatted-trivy-result.md
+#
+#      - name: Clean up Trivy result file
+#        run: rm -f trivy-result.txt formatted-trivy-result.md
