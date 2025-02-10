@@ -1,0 +1,19 @@
+name: Scanner test
+
+on:
+  pull_request:
+
+jobs:
+  checkov:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          framework: terraform
+          directory: ./aws-deploy
+          output_format: cli
+
+
