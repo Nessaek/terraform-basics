@@ -5,7 +5,5 @@ plugin "aws" {
 }
 
 config {
-  ignore_module = {
-    "te"
-  }
+
 }
