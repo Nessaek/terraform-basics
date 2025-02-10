@@ -31,6 +31,7 @@ jobs:
         with:
             iac_type: 'terraform'
             iac_version: 'v14'
+            iac_dir: './aws-deploy'
 
   tflint:
     runs-on: ubuntu-latest
@@ -63,20 +64,27 @@ jobs:
       - name: Trivy Scan
         uses: aquasecurity/trivy-action@0.29.0
         with:
-          scan-type: config
-          output: trivy.txt
-      - name: Publish output
-        run: |
-          if [[ -s trivy.txt ]]; then
-          {
-            echo "### Security Output"
-            echo "<details><summary>Click to expand</summary>"
-            echo ""
-            echo '```terraform'
-            cat trivy.txt
-            echo '```'
-            echo "</details>"
-          } >> $GITHUB_STEP_SUMMARY
-          fi
-
+          scan-type: 'fs'
+          trivy-config: config/trivy.yml
+      - name: Report to PR
+          uses: actions/github-script@v7
+          if: github.event_name == 'pull_request'
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            script: |
+              const fs = require('fs');
+              const report = fs.readFileSync('./apps/alpha/trivy-report.txt', 'utf8');
+              const output = `Trivy report:
+              \`\`\`\n
+              ${report.length > 0 ? report : 'No issues found'}
+              \`\`\`
+              
+              *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              })
 

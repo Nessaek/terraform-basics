@@ -1,0 +1,13 @@
+timeout: 5m0s
+exit-code: 1
+format: "table"
+report: "all"
+misconfiguration:
+  scanners:
+    - terraform
+  terraform:
+    vars: ["./aws-deploy/vars.tf"]
+scan:
+  scanners:
+    - secret
+    - misconfig
