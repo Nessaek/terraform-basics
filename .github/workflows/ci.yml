@@ -20,39 +20,39 @@ jobs:
 #          directory: ./aws-deploy
 #          output_format: cli
 
-  terrascan:
-    runs-on: ubuntu-latest
-    name: Terrascan
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Terrascan Scan
-        uses: tenable/terrascan-action@main
-        with:
-            iac_type: 'terraform'
-            iac_version: 'v14'
-            iac_dir: './aws-deploy'
-
-#  tflint:
+#  terrascan:
 #    runs-on: ubuntu-latest
-#    name: TFLint
+#    name: Terrascan
 #    steps:
-#      - uses: actions/checkout@v4
-#        name: Checkout source code
-#      - uses: actions/cache@v2
-#        name: Cache plugin dir
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#      - name: Terrascan Scan
+#        uses: tenable/terrascan-action@main
 #        with:
-#          path: config/plugins
-#          key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
-#      - uses: terraform-linters/setup-tflint@v4
-#        name: Setup TFLint
-#        with:
-#          tflint_version: v0.52.0
-#      - name: Init TFLint
-#        run: tflint --init
-#      - name: Run TFLint
-#        run: tflint -f compact -c config/.tflint.hcl
+#            iac_type: 'terraform'
+#            iac_version: 'v14'
+#            iac_dir: './aws-deploy'
 #
+  tflint:
+    runs-on: ubuntu-latest
+    name: TFLint
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout source code
+      - uses: actions/cache@v2
+        name: Cache plugin dir
+        with:
+          path: config/plugins
+          key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+      - uses: terraform-linters/setup-tflint@v4
+        name: Setup TFLint
+        with:
+          tflint_version: v0.52.0
+      - name: Init TFLint
+        run: tflint --init
+      - name: Run TFLint
+        run: tflint -f compact -c config/.tflint.hcl
+
 #  trivy:
 #    runs-on: ubuntu-latest
 #    name: Trivy (formerly tfsec)
