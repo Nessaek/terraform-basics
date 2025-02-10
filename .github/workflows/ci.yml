@@ -51,7 +51,7 @@ jobs:
       - name: Init TFLint
         run: tflint --init
       - name: Run TFLint
-        run: tflint -f compact -c config/.tflint.hcl
+        run: tflint -f compact
 
 #  trivy:
 #    runs-on: ubuntu-latest
