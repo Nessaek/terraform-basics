@@ -42,18 +42,16 @@ jobs:
       - uses: actions/cache@v2
         name: Cache plugin dir
         with:
-          path: ~/.tflint.d/plugins
+          path: config/plugins
           key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
       - uses: terraform-linters/setup-tflint@v4
         name: Setup TFLint
         with:
           tflint_version: v0.52.0
-      - name: Show version
-        run: tflint --version
       - name: Init TFLint
         run: tflint --init
       - name: Run TFLint
-        run: tflint -f compact
+        run: tflint -f compact -c config/.tflint.hcl
 
   trivy:
     runs-on: ubuntu-latest
