@@ -26,8 +26,6 @@ resource "aws_security_group" "ssh_http" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  #TODO
-  blah
   ingress {
     from_port   = 80
     to_port     = 80
