@@ -51,7 +51,7 @@ jobs:
       - name: Init TFLint
         run: tflint --init
       - name: Run TFLint
-        run: tflint -f compact ./aws-deploy
+        run: tflint -f compact --chdir=./aws-deploy
 
 #  trivy:
 #    runs-on: ubuntu-latest
