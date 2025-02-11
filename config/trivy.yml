@@ -1,0 +1,11 @@
+timeout: 5m0s
+exit-code: 1
+format: "table"
+report: "all"
+misconfiguration:
+  scanners:
+    - terraform
+scan:
+  scanners:
+    - secret
+    - misconfig

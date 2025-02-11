@@ -31,6 +31,7 @@ jobs:
         with:
             iac_type: 'terraform'
             iac_version: 'v14'
+            iac_dir: './aws-deploy'
 
   tflint:
     runs-on: ubuntu-latest
@@ -38,21 +39,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         name: Checkout source code
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         name: Cache plugin dir
         with:
-          path: ~/.tflint.d/plugins
+          path: config
           key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
       - uses: terraform-linters/setup-tflint@v4
         name: Setup TFLint
         with:
           tflint_version: v0.52.0
-      - name: Show version
-        run: tflint --version
       - name: Init TFLint
         run: tflint --init
       - name: Run TFLint
-        run: tflint -f compact
+        run: tflint -f compact --chdir=./aws-deploy
 
   trivy:
     runs-on: ubuntu-latest
@@ -63,20 +62,5 @@ jobs:
       - name: Trivy Scan
         uses: aquasecurity/trivy-action@0.29.0
         with:
-          scan-type: config
-          output: trivy.txt
-      - name: Publish output
-        run: |
-          if [[ -s trivy.txt ]]; then
-          {
-            echo "### Security Output"
-            echo "<details><summary>Click to expand</summary>"
-            echo ""
-            echo '```terraform'
-            cat trivy.txt
-            echo '```'
-            echo "</details>"
-          } >> $GITHUB_STEP_SUMMARY
-          fi
-
-
+          scan-type: 'fs'
+          trivy-config: config/trivy.yml
