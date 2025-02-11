@@ -33,37 +33,37 @@ jobs:
 #            iac_version: 'v14'
 #            iac_dir: './aws-deploy'
 #
-  tflint:
-    runs-on: ubuntu-latest
-    name: TFLint
-    steps:
-      - uses: actions/checkout@v4
-        name: Checkout source code
-      - uses: actions/cache@v4
-        name: Cache plugin dir
-        with:
-          path: config
-          key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
-      - uses: terraform-linters/setup-tflint@v4
-        name: Setup TFLint
-        with:
-          tflint_version: v0.52.0
-      - name: Init TFLint
-        run: tflint --init
-      - name: Run TFLint
-        run: tflint -f compact --chdir=./aws-deploy
-
-#  trivy:
+#  tflint:
 #    runs-on: ubuntu-latest
-#    name: Trivy (formerly tfsec)
+#    name: TFLint
 #    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#      - name: Trivy Scan
-#        uses: aquasecurity/trivy-action@0.29.0
+#      - uses: actions/checkout@v4
+#        name: Checkout source code
+#      - uses: actions/cache@v4
+#        name: Cache plugin dir
 #        with:
-#          scan-type: 'fs'
-#          trivy-config: config/trivy.yml
+#          path: config
+#          key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+#      - uses: terraform-linters/setup-tflint@v4
+#        name: Setup TFLint
+#        with:
+#          tflint_version: v0.52.0
+#      - name: Init TFLint
+#        run: tflint --init
+#      - name: Run TFLint
+#        run: tflint -f compact --chdir=./aws-deploy
+
+  trivy:
+    runs-on: ubuntu-latest
+    name: Trivy (formerly tfsec)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Trivy Scan
+        uses: aquasecurity/trivy-action@0.29.0
+        with:
+          scan-type: 'fs'
+          trivy-config: config/trivy.yml
 #          output: trivy-result.txt
 #      - name: Check Trivy result file
 #        run: cat trivy-result.txt
