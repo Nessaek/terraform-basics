@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: emoji-shop-ui
+  annotations:
+    cert-manager.io/cluster-issuer: ca-cert-cluster-issuer
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+      - emoji-shop.local.blah.com
+    secretName: emoji-shop-ui
+  rules:
+    - host: emoji-shop.notblah.notcom
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: emoji-shop-ui
+                port:
+                  number: 8100
