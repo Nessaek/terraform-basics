@@ -1,0 +1,59 @@
+name: OPA Gatekeeper
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    # - name: Set up Kind
+    #   uses: engineerd/setup-kind@v0.5.0
+    #   with:
+    #     version: v0.11.1
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v1
+      with:
+        version: v1.21.0
+
+    - name: Install go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.21.0
+
+    - name: Set up Kind
+      run: |
+        go install sigs.k8s.io/kind@v0.17.0
+        kind create cluster --name gatekeeper
+        kubectl cluster-info --context kind-gatekeeper
+        sleep 30
+        kubectl config get-contexts
+
+    - name: Install Gatekeeper
+      run: |
+        sleep 5
+        kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $(whoami) 
+        kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/v3.18.2/deploy/gatekeeper.yaml
+
+    - name: Apply Custom Resource Definitions (CRDs)
+      run: |
+        sleep 60
+        kubectl create -f gatekeeper/constraint_template.yml
+        kubectl get crds -A
+        kubectl get constrainttemplates
+        kubectl get constrainttemplates hostvalidation -o jsonpath='{.status}'
+        kubectl get pods -A
+        echo "got pods"
+        kubectl get pods -n gatekeeper-system
+        echo "got gatekeeper-system"
+        kubectl get -f gatekeeper/constraint_template.yml -o yaml
+        echo "got constraint_template"
+        for pod in $(kubectl get pods -n gatekeeper-system -o jsonpath='{.items[*].metadata.name}' | grep '^gatekeeper'); do
+                  echo "Logs for pod: $pod"
+                  kubectl logs $pod -n gatekeeper-system
+        done
+      # kubectl describe constrainttemplates
